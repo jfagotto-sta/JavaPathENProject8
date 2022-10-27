@@ -43,7 +43,7 @@ public class TourGuideController {
     @RequestMapping("/getNearbyAttractions") 
     public String getNearbyAttractions(@RequestParam String userName) {
     	VisitedLocation visitedLocation = tourGuideService.getUserLocation(getUser(userName));
-    	return JsonStream.serialize(tourGuideService.getNearByAttractions(visitedLocation));
+    	return JsonStream.serialize(tourGuideService.getFiveNearestAttractions(visitedLocation));
     }
     
     @RequestMapping("/getRewards") 
@@ -75,6 +75,7 @@ public class TourGuideController {
     private User getUser(String userName) {
     	return tourGuideService.getUser(userName);
     }
-   
+
+    //implémenter de la concurence dans le service avec concurency
 
 }

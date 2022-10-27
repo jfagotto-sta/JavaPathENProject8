@@ -2,13 +2,7 @@ package tourGuide.service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -100,6 +94,31 @@ public class TourGuideService {
 		
 		return nearbyAttractions;
 	}
+
+	public List<Attraction> getFiveNearestAttractions(VisitedLocation visitedLocation) {
+		List<Attraction> attractions = gpsUtil.getAttractions();
+		HashMap<Attraction, Double> attractionsSelonDistanceUser = new HashMap<>();
+		for (Attraction attraction :attractions) {
+			attractionsSelonDistanceUser.put(attraction, rewardsService.getDistance(attraction, visitedLocation.location));
+		}
+
+		attractionsSelonDistanceUser = attractionsSelonDistanceUser.entrySet().stream().sorted((a1,a2) -> a1.getValue().compareTo(a2.getValue())).
+				collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1,e2) -> e1, HashMap::new));
+
+		List<Attraction> closestAttractions = new ArrayList<>();
+		int counter = 0;
+		for (Map.Entry<Attraction,Double> entry : attractionsSelonDistanceUser.entrySet()) {
+			closestAttractions.add(entry.getKey());
+			counter++;
+			if(counter > 4) {
+				break;
+			}
+		}
+
+		return closestAttractions;
+	}
+
+
 	
 	private void addShutDownHook() {
 		Runtime.getRuntime().addShutdownHook(new Thread() { 
