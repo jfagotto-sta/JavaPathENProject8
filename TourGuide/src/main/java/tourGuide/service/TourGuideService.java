@@ -3,11 +3,13 @@ package tourGuide.service;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import gpsUtil.GpsUtil;
@@ -17,6 +19,7 @@ import gpsUtil.location.VisitedLocation;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.tracker.Tracker;
 import tourGuide.user.User;
+import tourGuide.user.UserPreferences;
 import tourGuide.user.UserReward;
 import tripPricer.Provider;
 import tripPricer.TripPricer;
@@ -29,7 +32,11 @@ public class TourGuideService {
 	private final TripPricer tripPricer = new TripPricer();
 	public final Tracker tracker;
 	boolean testMode = true;
-	
+	private ExecutorService executorService = Executors.newFixedThreadPool(1000);
+
+
+
+
 	public TourGuideService(GpsUtil gpsUtil, RewardsService rewardsService) {
 		this.gpsUtil = gpsUtil;
 		this.rewardsService = rewardsService;
@@ -43,7 +50,8 @@ public class TourGuideService {
 		tracker = new Tracker(this);
 		addShutDownHook();
 	}
-	
+
+
 	public List<UserReward> getUserRewards(User user) {
 		return user.getUserRewards();
 	}
@@ -82,6 +90,45 @@ public class TourGuideService {
 		user.addToVisitedLocations(visitedLocation);
 		rewardsService.calculateRewards(user);
 		return visitedLocation;
+	}
+
+
+	//utiliser concurencyArraylist
+
+	public HashMap<User,VisitedLocation> trackUsersLocation(List<User> users) {
+
+		List<CompletableFuture> futures = new ArrayList<>();
+		HashMap<User,VisitedLocation> userLocation = new HashMap<>();
+		for (User u : users) {
+			futures.add(CompletableFuture.supplyAsync(() -> trackUserLocation(u), executorService));
+					//.whenComplete((data, error) -> userLocation.put(u,data)));
+		}
+
+		for (CompletableFuture cf : futures) {
+			try {
+				cf.get();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+			}
+		}
+		return userLocation;
+	}
+
+	public void calculateRewardsForAllUsers(List<User> users){
+
+		ExecutorService executorService1 = Executors.newFixedThreadPool(1000);
+		users.forEach(user ->
+				executorService1.submit(new Thread(() -> rewardsService.calculateRewards(user))));
+
+		executorService1.shutdown();
+
+		try {
+			executorService1.awaitTermination(20, TimeUnit.MINUTES);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public List<Attraction> getNearByAttractions(VisitedLocation visitedLocation) {
@@ -142,8 +189,9 @@ public class TourGuideService {
 			String phone = "000";
 			String email = userName + "@tourGuide.com";
 			User user = new User(UUID.randomUUID(), userName, phone, email);
+			//user.getUserPreferences().setNumberOfAdults(5);
 			generateUserLocationHistory(user);
-			
+			//creer des preferences randoms
 			internalUserMap.put(userName, user);
 		});
 		logger.debug("Created " + InternalTestHelper.getInternalUserNumber() + " internal test users.");

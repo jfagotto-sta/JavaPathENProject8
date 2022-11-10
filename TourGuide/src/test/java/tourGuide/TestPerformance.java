@@ -58,14 +58,14 @@ public class TestPerformance {
 	    StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
 
-
-		for(User user : allUsers) {
-			MonThread thread = new MonThread();
-			thread.init(user, tourGuideService);
-			thread.start();
-
-			//tourGuideService.trackUserLocation(user);
-		}
+		tourGuideService.trackUsersLocation(allUsers);
+//		for(User user : allUsers) {
+//			MonThread thread = new MonThread();
+//			thread.init(user, tourGuideService);
+//			thread.start();
+//
+//			//tourGuideService.trackUserLocation(user);
+//		}
 		stopWatch.stop();
 		tourGuideService.tracker.stopTracking();
 
@@ -79,21 +79,21 @@ public class TestPerformance {
 		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
 
 		// Users should be incremented up to 100,000, and test finishes within 20 minutes
-		InternalTestHelper.setInternalUserNumber(100);
+		InternalTestHelper.setInternalUserNumber(1000);
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
 		TourGuideService tourGuideService = new TourGuideService(gpsUtil, rewardsService);
 
 	    Attraction attraction = gpsUtil.getAttractions().get(0);
-		List<User> allUsers = new ArrayList<>();
-		allUsers = tourGuideService.getAllUsers();
+		List<User> allUsers = tourGuideService.getAllUsers();
 		allUsers.forEach(u -> u.addToVisitedLocations(new VisitedLocation(u.getUserId(), attraction, new Date())));
 
-	    allUsers.forEach(u -> rewardsService.calculateRewards(u));
 
-		for(User user : allUsers) {
-			assertTrue(user.getUserRewards().size() > 0);
-		}
+		tourGuideService.calculateRewardsForAllUsers(allUsers);
+		//allUsers.forEach(u -> rewardsService.calculateRewards(u));
+//		for(User user : allUsers) {
+//			assertTrue(user.getUserRewards().size() > 0);
+//		}
 		stopWatch.stop();
 		tourGuideService.tracker.stopTracking();
 
