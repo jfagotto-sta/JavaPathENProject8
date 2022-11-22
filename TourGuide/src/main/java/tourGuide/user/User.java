@@ -70,8 +70,19 @@ public class User {
 	}
 	
 	public void addUserReward(UserReward userReward) {
-		if(userRewards.stream().filter(r -> !r.attraction.attractionName.equals(userReward.attraction)).count() == 0) {
+		//if(userRewards.stream().filter(r -> !r.attraction.attractionName.equals(userReward.attraction)).count() == 0) {
+		boolean existedeja = false;
+		int index = -1;
+		for (int i = 0; i<getUserRewards().size(); i++) {
+			if(getUserRewards().get(i).attraction.attractionName.equals(userReward.attraction.attractionName)) {
+				existedeja = true;
+				index = i;
+			}
+		}
+		if(!existedeja) {
 			userRewards.add(userReward);
+		} else {
+			getUserRewards().get(index).setRewardPoints(userReward.getRewardPoints());
 		}
 	}
 	

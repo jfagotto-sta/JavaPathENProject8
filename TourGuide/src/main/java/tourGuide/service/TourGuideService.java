@@ -9,7 +9,6 @@ import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import gpsUtil.GpsUtil;
@@ -19,7 +18,6 @@ import gpsUtil.location.VisitedLocation;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.tracker.Tracker;
 import tourGuide.user.User;
-import tourGuide.user.UserPreferences;
 import tourGuide.user.UserReward;
 import tripPricer.Provider;
 import tripPricer.TripPricer;
@@ -101,7 +99,6 @@ public class TourGuideService {
 		HashMap<User,VisitedLocation> userLocation = new HashMap<>();
 		for (User u : users) {
 			futures.add(CompletableFuture.supplyAsync(() -> trackUserLocation(u), executorService));
-					//.whenComplete((data, error) -> userLocation.put(u,data)));
 		}
 
 		for (CompletableFuture cf : futures) {
@@ -219,5 +216,22 @@ public class TourGuideService {
 		LocalDateTime localDateTime = LocalDateTime.now().minusDays(new Random().nextInt(30));
 	    return Date.from(localDateTime.toInstant(ZoneOffset.UTC));
 	}
-	
+
+	public HashMap<UUID, Location> getUsersLatestLocation( ) {
+		HashMap<UUID, Location> map = new HashMap<>();
+		List<User> userList = getAllUsers();
+
+		for (User user: userList) {
+			List<VisitedLocation> visitedLocationList = user.getVisitedLocations();
+			visitedLocationList.sort( (v1,v2) -> v1.timeVisited.compareTo(v2.timeVisited));
+			map.put(user.getUserId(),visitedLocationList.get(visitedLocationList.size()-1).location);
+		}
+		return map;
+	}
+
+	public List<VisitedLocation> getUserLocations (User user) {
+
+
+		return user.getVisitedLocations();
+	}
 }

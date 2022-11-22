@@ -1,7 +1,10 @@
 package tourGuide;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
+import gpsUtil.location.Location;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -52,7 +55,9 @@ public class TourGuideController {
     }
     
     @RequestMapping("/getAllCurrentLocations")
-    public String getAllCurrentLocations() {
+    public HashMap<UUID, Location> getAllCurrentLocations() {
+        return tourGuideService.getUsersLatestLocation();
+
     	// TODO: Get a list of every user's most recent location as JSON
     	//- Note: does not use gpsUtil to query for their current location, 
     	//        but rather gathers the user's current location from their stored location history.
@@ -63,7 +68,7 @@ public class TourGuideController {
     	//        ...
     	//     }
     	
-    	return JsonStream.serialize("");
+
     }
     
     @RequestMapping("/getTripDeals")
@@ -76,6 +81,10 @@ public class TourGuideController {
     	return tourGuideService.getUser(userName);
     }
 
-    //implémenter de la concurence dans le service avec concurency
+
+    @RequestMapping("/test")
+    public List<VisitedLocation> test(@RequestParam String userName) {
+        return tourGuideService.getUserLocations(getUser(userName));
+    }
 
 }
