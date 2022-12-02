@@ -114,6 +114,7 @@ public class TestTourGuideService {
 
 	@Test
 	public void getTripDeals() {
+		Locale.setDefault(Locale.US);
 		GpsUtil gpsUtil = new GpsUtil();
 		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
 		InternalTestHelper.setInternalUserNumber(0);
@@ -125,7 +126,7 @@ public class TestTourGuideService {
 		
 		tourGuideService.tracker.stopTracking();
 		
-		assertEquals(10, providers.size());
+		assertEquals(5, providers.size());
 	}
 	
 	

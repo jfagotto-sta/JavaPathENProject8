@@ -18,6 +18,7 @@ import gpsUtil.location.VisitedLocation;
 import tourGuide.helper.InternalTestHelper;
 import tourGuide.tracker.Tracker;
 import tourGuide.user.User;
+import tourGuide.user.UserPreferences;
 import tourGuide.user.UserReward;
 import tripPricer.Provider;
 import tripPricer.TripPricer;
@@ -162,6 +163,11 @@ public class TourGuideService {
 		return closestAttractions;
 	}
 
+	public void updateUserPreferences(UserPreferences userPreferences,String userName) {
+	User u = getUser(userName);
+	u.setUserPreferences(userPreferences);
+	}
+
 
 	
 	private void addShutDownHook() {
@@ -234,4 +240,6 @@ public class TourGuideService {
 
 		return user.getVisitedLocations();
 	}
+
+
 }
