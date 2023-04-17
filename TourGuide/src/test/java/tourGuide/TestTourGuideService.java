@@ -23,6 +23,7 @@ public class TestTourGuideService {
 
 	@Test
 	public void getUserLocation() {
+		Locale.setDefault(Locale.US);
 		GpsUtil gpsUtil = new GpsUtil();
 		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
 		InternalTestHelper.setInternalUserNumber(0);
@@ -36,6 +37,7 @@ public class TestTourGuideService {
 	
 	@Test
 	public void addUser() {
+		Locale.setDefault(Locale.US);
 		GpsUtil gpsUtil = new GpsUtil();
 		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
 		InternalTestHelper.setInternalUserNumber(0);
@@ -58,6 +60,7 @@ public class TestTourGuideService {
 	
 	@Test
 	public void getAllUsers() {
+		Locale.setDefault(Locale.US);
 		GpsUtil gpsUtil = new GpsUtil();
 		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
 		InternalTestHelper.setInternalUserNumber(0);
@@ -79,6 +82,7 @@ public class TestTourGuideService {
 	
 	@Test
 	public void trackUser() {
+		Locale.setDefault(Locale.US);
 		GpsUtil gpsUtil = new GpsUtil();
 		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
 		InternalTestHelper.setInternalUserNumber(0);
@@ -94,7 +98,12 @@ public class TestTourGuideService {
 	
 	@Ignore // Not yet implemented
 	@Test
+<<<<<<< Updated upstream
 	public void getNearbyAttractions() {
+=======
+	public void getFiveNearestAttraction() {
+		Locale.setDefault(Locale.US);
+>>>>>>> Stashed changes
 		GpsUtil gpsUtil = new GpsUtil();
 		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());
 		InternalTestHelper.setInternalUserNumber(0);

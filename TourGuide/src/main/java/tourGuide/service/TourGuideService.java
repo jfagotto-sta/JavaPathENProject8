@@ -35,7 +35,19 @@ public class TourGuideService {
 	private final TripPricer tripPricer = new TripPricer();
 	public final Tracker tracker;
 	boolean testMode = true;
+<<<<<<< Updated upstream
 	
+=======
+	private ExecutorService executorService = Executors.newFixedThreadPool(10);
+
+	public ExecutorService getExecutorService(){
+		return executorService;
+	}
+
+
+
+
+>>>>>>> Stashed changes
 	public TourGuideService(GpsUtil gpsUtil, RewardsService rewardsService) {
 		this.gpsUtil = gpsUtil;
 		this.rewardsService = rewardsService;
@@ -90,6 +102,46 @@ public class TourGuideService {
 		return visitedLocation;
 	}
 
+<<<<<<< Updated upstream
+=======
+
+	//utiliser concurencyArraylist
+
+	public void trackUsersLocation(List<User> users) {
+
+		List<CompletableFuture> futures = new ArrayList<>();
+
+		for (User u : users) {
+			futures.add(CompletableFuture.runAsync(() -> trackUserLocation(u), executorService));
+		}
+
+		for (CompletableFuture cf : futures) {
+			try {
+				cf.get();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void calculateRewardsForAllUsers(List<User> users){
+
+		ExecutorService executorService1 = Executors.newFixedThreadPool(65);
+		users.forEach(user ->
+				executorService1.submit(new Thread(() -> rewardsService.calculateRewards(user))));
+
+		executorService1.shutdown();
+
+		try {
+			executorService1.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+>>>>>>> Stashed changes
 	public List<Attraction> getNearByAttractions(VisitedLocation visitedLocation) {
 		List<Attraction> nearbyAttractions = new ArrayList<>();
 		for(Attraction attraction : gpsUtil.getAttractions()) {
